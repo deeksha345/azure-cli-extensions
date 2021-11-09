@@ -3,6 +3,10 @@
 Release History
 ===============
 
+1.1.0
+++++++++++++++++++
+* Support Extensions Types list, list by location, show, and list versions
+
 1.0.0
 ++++++++++++++++++
 * Switch to GA api-version of Extensions (2021-09-01)
