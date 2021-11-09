@@ -22,6 +22,10 @@ from ._configuration import SourceControlConfigurationClientConfiguration
 from .operations import ExtensionsOperations
 from .operations import OperationStatusOperations
 from .operations import Operations
+from .operations import ClusterExtensionTypeOperations
+from .operations import ClusterExtensionTypesOperations
+from .operations import ExtensionTypeVersionsOperations
+from .operations import LocationExtensionTypesOperations
 from . import models
 
 
@@ -52,6 +56,7 @@ class SourceControlConfigurationClient(object):
         # type: (...) -> None
         if not base_url:
             base_url = 'https://management.azure.com'
+        
         self._config = SourceControlConfigurationClientConfiguration(credential, subscription_id, **kwargs)
         self._client = ARMPipelineClient(base_url=base_url, config=self._config, **kwargs)
 
@@ -65,6 +70,14 @@ class SourceControlConfigurationClient(object):
         self.operation_status = OperationStatusOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.operations = Operations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.cluster_extension_type = ClusterExtensionTypeOperations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.cluster_extension_types = ClusterExtensionTypesOperations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.extension_type_version = ExtensionTypeVersionsOperations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.location_extension_types = LocationExtensionTypesOperations(
             self._client, self._config, self._serialize, self._deserialize)
 
     def _send_request(self, http_request, **kwargs):

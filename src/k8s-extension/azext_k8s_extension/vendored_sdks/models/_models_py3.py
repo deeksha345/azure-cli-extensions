@@ -755,6 +755,145 @@ class ScopeNamespace(msrest.serialization.Model):
         self.target_namespace = target_namespace
 
 
+class ExtensionTypeVersionsList(msrest.serialization.Model):
+    """Result of the request to list operations.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :param value: List of operations supported by this resource provider.
+    :type value: list[~azure.mgmt.kubernetesconfiguration.models.ExtensionTypeVersionsOperation]
+    :ivar next_link: URL to the next set of results, if any.
+    :vartype next_link: str
+    """
+
+    _attribute_map = {
+        'value': {'key': 'value', 'type': '[ExtensionTypeVersionsOperation]'},
+        'next_link': {'key': 'nextLink', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        value: Optional[List["ExtensionTypeVersionsOperation"]] = None,
+        **kwargs
+    ):
+        super(ExtensionTypeVersionsList, self).__init__(**kwargs)
+        self.value = value
+        self.next_link = None
+
+
+class ExtensionTypeVersionsOperation(msrest.serialization.Model):
+    """The Extension Type Versions Request object.
+
+    :param versions: List of all versions for a release train of extension type
+    :type versions: list[str]
+    :param release_train: ReleaseTrain correspondig to the list of versions this 
+     extension type is available for (e.g. Stable, Preview, etc.)
+    :type release_train: str
+    """
+
+    _attribute_map = {
+        'versions': {'key': 'versions', 'type': '[str]'},
+        'release_train': {'key': 'releaseTrain', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        versions: Optional[List[str]] = None,
+        release_train: Optional[str] = None,
+        **kwargs
+    ):
+        super(ExtensionTypeVersionsOperation, self).__init__(**kwargs)
+        self.versions = versions
+        self.release_train = release_train
+
+
+class ExtensionTypesList(msrest.serialization.Model):
+    """Result of the request to list operations.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :param value: List of operations supported by this resource provider.
+    :type value: list[~azure.mgmt.kubernetesconfiguration.models.ExtensionTypesOperation]
+    :ivar next_link: URL to the next set of results, if any.
+    :vartype next_link: str
+    """
+
+    _attribute_map = {
+        'value': {'key': 'value', 'type': '[ExtensionTypesOperation]'},
+        'next_link': {'key': 'nextLink', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        value: Optional[List["ExtensionTypesOperation"]] = None,
+        **kwargs
+    ):
+        super(ExtensionTypesList, self).__init__(**kwargs)
+        self.value = value
+        self.next_link = None
+
+
+class ExtensionTypesOperation(msrest.serialization.Model):
+    """The Extension Types Request object.
+
+    :ivar id: Fully qualified resource ID for the resource. Ex -
+     /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or
+     "Microsoft.Storage/storageAccounts".
+    :vartype type: str
+    :param allow_multiple_instances: bool value specifying whether to allow multiple
+     instances of extension type 
+    :type allow_multiple_instance: bool
+    :param default_release_namespace: The default namespace for the supported scope of 
+     extension type
+    :type default_release_namespace: str
+    :param release_trains: List of release trains available for this extension type
+     (e.g. Stable, Preview, etc.)
+    :type release_trains: [str]
+    :param cluster_types: List of cluster types for this extension type
+    :type cluster_types: [str]
+    :param default_scope: The default scope for this extension type
+    :type default_scope: str
+    """
+
+    _attribute_map = {
+        'default_scope': {'key': 'properties.supportedScopes.defaultScope', 'type': 'str'},
+        'release_trains': {'key': 'properties.releaseTrains', 'type': '[str]'},
+        'cluster_types': {'key': 'properties.clusterTypes', 'type': '[str]'},
+        'id': {'key': 'properties.supportedScopes.clusterScopeSettings.id', 'type': 'str'},
+        'name': {'key': 'properties.supportedScopes.clusterScopeSettings.name', 'type': 'str'},
+        'type': {'key': 'properties.supportedScopes.clusterScopeSettings.type', 'type': 'str'},
+        'allow_multiple_instances': {'key': 'properties.supportedScopes.clusterScopeSettings.properties.allowMultipleInstances', 'type': 'bool'},
+        'default_release_namespace': {'key': 'properties.supportedScopes.clusterScopeSettings.properties.defaultReleaseNamespace', 'type': 'str'}
+    }
+
+    def __init__(
+        self,
+        default_scope: Optional[str] = None,
+        release_trains: Optional[List[str]] = None,
+        cluster_types: Optional[List[str]] = None,
+        id: Optional[str] = None,
+        type: Optional[str] = None,
+        name: Optional[str] = None,
+        allow_multiple_instances: Optional[bool] = False,
+        default_release_namespace: Optional[str] = None,
+        **kwargs
+    ):
+        super(ExtensionTypesOperation, self).__init__(**kwargs)
+        self.release_trains = release_trains
+        self.cluster_types = cluster_types
+        self.default_scope = default_scope
+        self.allow_multiple_instances = allow_multiple_instances
+        self.default_release_namespace = default_release_namespace
+        self.id = id
+        self.type = type
+        self.name = name
+
+
 class SystemData(msrest.serialization.Model):
     """Metadata pertaining to creation and last modification of the resource.
 
