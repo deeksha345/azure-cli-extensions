@@ -231,15 +231,11 @@ def delete_k8s_extension(cmd, client, resource_group_name, cluster_name, name, c
     return sdk_no_wait(no_wait, client.begin_delete, resource_group_name,
                        cluster_rp, cluster_type, cluster_name, name, force_delete=force)
 
-
-def list_k8s_extension_type_versions(client, location, extension_type):
+def list_k8s_extension_type_versions(cmd, client, location, extension_type):
     """ List available extension type versions
     """
     versions_list = client.list(location, extension_type)
-    # if not versions_list.__dict__['_kwargs']: 
-    #     # versions_list returned null 
-    #     message = "Extension Type {0} does not have any supported versions.".format(extension_type)
-    return []
+    return versions_list
 
 
 def list_k8s_cluster_extension_types(client, resource_group_name, cluster_name, cluster_type):
