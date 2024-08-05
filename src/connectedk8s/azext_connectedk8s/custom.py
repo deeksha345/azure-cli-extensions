@@ -519,40 +519,39 @@ def create_connectedk8s(cmd, client, resource_group_name, cluster_name, correlat
                                onboarding_timeout, container_log_path)
     print("Step: {}: Helm install of Azure arc agents Release ended.".format(utils.get_utctimestring()))
     
-    # Add 2nd long running operation to wait for Agent State to reach terminal stage with a default 20 minute timeout
-    # window 
-    # TODO: Update poll_for_agent_state method to check for agent state and not provisioning state when feedback loop
-    # is implemented
-    if enable_oidc_issuer or enable_workload_identity:
-        print("Waiting for Agent State to reach terminal state")
-        if not poll_for_agent_state(cmd, resource_group_name, cluster_name):
-            print("Timed out waiting for Agent State to reach terminal state")
-            return False
+    """
+    Long Running Operation for Agent State
+    Agent state is used for feedback of workload identity extension installation
+    Cases for when to poll for agent state:
+        - If OIDC is enabled and self hosted issuer is passed in, extension is not installed.
+          Feedback loop is not enabled, do not poll for agent state.
+        - If OIDC is enabled and self hosted issuer is empty, extension is installed.
+          Need to poll for agent state.
+        - If workload identity is enabled, extension is installed, poll for agent state.
+    """
+    if (enable_oidc_issuer and self_hosted_issuer == "") or enable_workload_identity:
+        print("Step: {}: Wait for Agent State to reach terminal state, with timeout of {}".format(utils.get_utctimestring(), 
+                                                                                                consts.Agent_State_Timeout))
+        if poll_for_agent_state(cmd, resource_group_name, cluster_name):
+            connected_cluster = get_connectedk8s_2024_07_01(cmd, resource_group_name, cluster_name)
+            print("Step: {}: Agent state has reached terminal state of {}.".format(utils.get_utctimestring(), 
+                                                                                connected_cluster.arc_agent_profile.agent_state))
+        else:
+            raise CLIInternalError("Timed out waiting for Agent State to reach terminal state.")
     
     return put_cc_response
 
-def poll_for_agent_state(cmd, resource_group_name, cluster_name, timeout_minutes=20, interval=5):
-    """
-    Polls for agent state to reach a terminal state with a timeout.
-
-    Args:
-        resource_group_name: Name of cluster's resource group
-        cluster_name: Name of cluster resource
-        timeout_minutes (int, optional): Timeout in minutes. Defaults to 10 minutes.
-        interval (float, optional): Time interval between attempts in seconds. Defaults to 1.
-    """
-
+def poll_for_agent_state(cmd, resource_group_name, cluster_name, timeout_minutes=consts.Agent_State_Timeout, 
+                        interval=5):
     start_time = time.time()
     while True:
         connected_cluster = get_connectedk8s_2024_07_01(cmd, resource_group_name, cluster_name)
         # Checking for provisioning state now as agent state feedback loop is not implemented
-        if connected_cluster.provisioning_state == "Succeeded" or connected_cluster.provisioning_state == "Failed":
-            print("Agent state has reached terminal state of: " + connected_cluster.provisioning_state)
+        if connected_cluster.arc_agent_profile.agent_state == consts.Agent_State_Succeeded or \
+            connected_cluster.arc_agent_profile.agent_state == consts.Agent_State_Failed:
             return True
         elapsed_time = time.time() - start_time
         if elapsed_time >= timeout_minutes * 60:
-            print("Agent state has not reached terminal state within " + timeout_minutes + " minute timeout window: " +
-                  connected_cluster.provisioning_state)
             return False
         time.sleep(interval)
 
@@ -937,7 +936,6 @@ def check_arm64_node(api_response):
     return False
 
 def set_oidc_issuer_profile(enable_oidc_issuer, self_hosted_issuer = ""):
-    oidc_profile = None
     oidc_profile = OidcIssuerProfile(
         enabled=enable_oidc_issuer
     )
@@ -946,7 +944,6 @@ def set_oidc_issuer_profile(enable_oidc_issuer, self_hosted_issuer = ""):
     return oidc_profile
 
 def set_security_profile(enable_workload_identity):
-    security_profile = None
     security_profile = SecurityProfile(
         workload_identity= SecurityProfileWorkloadIdentity(
             enabled=enable_workload_identity
@@ -1486,16 +1483,25 @@ def update_connected_cluster(cmd, client, resource_group_name, cluster_name, htt
     if not arm_properties_unset:
         return patch_cc_response
     
-    # Add 2nd long running operation to wait for Agent State to reach terminal stage with a default 20 minute 
-    # timeout window 
-    # TODO: Update poll_for_agent_state method to check for agent state and not provisioning state when feedback loop 
-    # is implemented
-    # This condition will be hit after provisioning state 
-    if enable_oidc_issuer or enable_workload_identity:
-        print("Hold for Agent State to reach terminal state")
-        if not poll_for_agent_state(cmd, resource_group_name, cluster_name):
-            print("Timed out waiting for Agent State to reach terminal state")
-            return False
+    """
+    Long Running Operation for Agent State
+    Agent state is used for feedback of workload identity extension installation
+    Cases for when to poll for agent state:
+        - If OIDC is enabled and self hosted issuer is passed in, extension is not installed.
+          Feedback loop is not enabled, do not poll for agent state.
+        - If OIDC is enabled and self hosted issuer is empty, extension is installed.
+          Need to poll for agent state.
+        - If workload identity is enabled, extension is installed, poll for agent state.
+    """
+    if (enable_oidc_issuer and self_hosted_issuer == "") or enable_workload_identity:
+        print("Step: {}: Wait for Agent State to reach terminal state, with timeout of {}".format(utils.get_utctimestring(), 
+                                                                                                        consts.Agent_State_Timeout))
+        if poll_for_agent_state(cmd, resource_group_name, cluster_name):
+            connected_cluster = get_connectedk8s_2024_07_01(cmd, resource_group_name, cluster_name)
+            print("Step: {}: Agent state has reached terminal state of {}".format(utils.get_utctimestring(), 
+                                                                                connected_cluster.arc_agent_profile.agent_state))
+        else:
+            raise CLIInternalError("Timed out waiting for Agent State to reach terminal state.")
     
     return reput_cc_response
 
