@@ -3,8 +3,10 @@
 Release History
 ===============
 
-1.9.1
+
+1.10.0
 ++++++
+* Added support for arc gateway feature.
 * Bug fix for Workload Identity poll or agent state
 * Bug fix for connectedk8s update with workload identity enabled
 
