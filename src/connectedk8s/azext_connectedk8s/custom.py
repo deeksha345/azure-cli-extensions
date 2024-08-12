@@ -534,7 +534,7 @@ def create_connectedk8s(cmd, client, resource_group_name, cluster_name, correlat
     for helm_parameter, helm_value in protected_helm_values.items():
         helm_content_values[helm_parameter] = helm_value
 
-    print("Starting to install Azure arc agents on the Kubernetes cluster.")
+    print("Step: {}: Starting to install Azure arc agents on the Kubernetes cluster.".format(utils.get_utctimestring()))
     # Install azure-arc agents
     utils.helm_install_release(cmd.cli_ctx.cloud.endpoints.resource_manager, chart_path, kubernetes_distro,
                                kubernetes_infra, location, private_key_pem, kube_config, kube_context, no_wait,
